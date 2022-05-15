@@ -75,10 +75,15 @@ WSGI_APPLICATION = 'eld.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'eld-db',
+        'USER': 'postgres',
+        'PASSWORD': '1234',
+        'HOST': '35.224.11.188',
+        'PORT': '5432',
     }
 }
+
 
 
 # Password validation
