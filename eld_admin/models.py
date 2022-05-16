@@ -1,6 +1,6 @@
 from django.db.models import Model, IntegerField, PositiveSmallIntegerField, CharField, EmailField, \
     BooleanField, OneToOneField, SET_NULL, ForeignKey, RESTRICT, BigIntegerField, TimeField, DateField, CASCADE, \
-    ManyToManyField
+    ManyToManyField, AutoField, BigAutoField
 
 from phonenumber_field.modelfields import PhoneNumberField
 from address.models import AddressField, State, Locality
@@ -9,13 +9,13 @@ from .validators import *
 
 
 class UnitGroup(Model):
-    id = IntegerField(primary_key=True)
+    id = AutoField(primary_key=True)
     name = CharField(max_length=50)
     description = CharField(max_length=500, null=True, blank=True)
 
 
 class Unit(Model):
-    id = IntegerField(primary_key=True)
+    id = AutoField(primary_key=True)
     name = CharField(max_length=10, unique=True, null=True, blank=True)
     year = PositiveSmallIntegerField(validators=[validate_unit_year], null=True, blank=True)
     make = CharField(max_length=50, null=True, blank=True)
@@ -40,7 +40,7 @@ class Trailer(Unit):
 
 
 class Driver(Model):
-    id = IntegerField(primary_key=True)
+    id = AutoField(primary_key=True)
     first_name = CharField(max_length=35)
     middle_name = CharField(max_length=35, null=True, blank=True)
     last_name = CharField(max_length=35)
@@ -56,17 +56,17 @@ class Driver(Model):
 
 
 class Log(Model):
-    id = BigIntegerField(primary_key=True)
+    id = BigAutoField(primary_key=True)
     date = DateField()
     driver = ForeignKey(Driver, on_delete=RESTRICT, null=True)
     fromAddress = Locality()
     toAddress = Locality()
     distance = PositiveSmallIntegerField(null=True, blank=True)
     notes = CharField(max_length=50, null=True, blank=True)
-    trucks = ManyToManyField(Truck)
-    trailers = ManyToManyField(Trailer)
-    shipping_docs_uploaded = BooleanField()
-    DVIR_completed = BooleanField()
+    trucks = ManyToManyField(Truck, null=True, blank=True)
+    trailers = ManyToManyField(Trailer, null=True, blank=True)
+    shipping_docs_uploaded = BooleanField(default=False)
+    DVIR_completed = BooleanField(default=False)
 
     class Meta:
         unique_together = ('date', 'driver')
@@ -74,14 +74,14 @@ class Log(Model):
 
 
 class Status(Model):
-    id = PositiveSmallIntegerField(primary_key=True)
+    id = AutoField(primary_key=True)
     name = CharField(max_length=10)
     note = CharField(max_length=50, null=True, blank=True)
     optional = BooleanField(default=False)
 
 
 class LogEvent(Model):
-    id = BigIntegerField(primary_key=True)
+    id = BigAutoField(primary_key=True)
     log = ForeignKey(Log, on_delete=CASCADE)
     status = ForeignKey(Status, on_delete=RESTRICT)
     start_time = TimeField()
