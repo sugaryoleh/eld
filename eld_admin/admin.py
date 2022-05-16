@@ -1,3 +1,11 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import *
+
+admin.site.register(UnitGroup)
+admin.site.register(Truck)
+admin.site.register(Trailer)
+admin.site.register(Driver)
+admin.site.register(Log)
+admin.site.register(Status)
+admin.site.register(LogEvent)
