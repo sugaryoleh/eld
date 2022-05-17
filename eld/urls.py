@@ -20,10 +20,15 @@ from eld_admin import views
 
 
 router = routers.DefaultRouter()
+router.register(r'provinces', views.ProvinceViewSet)
+router.register(r'addresses', views.AddressViewSet)
 router.register(r'unit-groups', views.UnitGroupViewSet)
 router.register(r'trucks', views.TruckViewSet)
 router.register(r'trailers', views.TrailerViewSet)
 router.register(r'drivers', views.DriverViewSet)
+router.register(r'logs', views.LogViewSet)
+router.register(r'log-events', views.LogEventViewSet)
+router.register(r'statuses', views.StatusViewSet)
 
 
 urlpatterns = [

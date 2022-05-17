@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User, Group
 from django.db.models import Model, IntegerField, PositiveSmallIntegerField, CharField, EmailField, \
     BooleanField, OneToOneField, SET_NULL, ForeignKey, RESTRICT, BigIntegerField, TimeField, DateField, CASCADE, \
     ManyToManyField, AutoField, BigAutoField
@@ -14,6 +15,9 @@ class Province(Model):
 
     class Meta:
         unique_together = ('name', 'code')
+
+    def __str__(self):
+        return '{}'.format(self.code)
 
 
 class Address(Model):
@@ -64,6 +68,7 @@ class Trailer(Unit):
 
 class Driver(Model):
     id = AutoField(primary_key=True)
+    user = OneToOneField(User, on_delete=CASCADE, null=True, blank=True)
     first_name = CharField(max_length=35)
     middle_name = CharField(max_length=35, null=True, blank=True)
     last_name = CharField(max_length=35)
@@ -74,6 +79,13 @@ class Driver(Model):
     truck = OneToOneField(Truck, on_delete=SET_NULL, null=True, blank=True, unique=True)
     trailer = OneToOneField(Trailer, on_delete=SET_NULL, null=True, blank=True, unique=True)
     notes = CharField(max_length=500, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        user = User(username=self.email, password=self.email)
+        user.save()
+        user.groups.add(Group.objects.get(name='Drivers'))
+        self.user = user
+        super(Driver,self).save(*args, **kwargs)
 
     # TODO: add file field
 
@@ -114,5 +126,6 @@ class LogEvent(Model):
     truck = ForeignKey(Truck, on_delete=RESTRICT)
     odometer_value = PositiveSmallIntegerField(null=True, blank=True)
     notes = CharField(max_length=40)
+    # todo: add location
 
 
