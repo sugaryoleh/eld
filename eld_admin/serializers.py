@@ -24,7 +24,7 @@ class UnitGroupSerializer(ModelSerializer):
 class UnitSerializer(HyperlinkedModelSerializer):
     class Meta:
         model = Unit
-        fields = ['name', 'year', 'make', 'model', 'license_plate_no', 'license_plate_state', 'VIN', 'group']
+        fields = ['name', 'year', 'make', 'model', 'license_plate_no', 'license_plate_province', 'VIN', 'group']
 
 
 class TruckSerializer(UnitSerializer):

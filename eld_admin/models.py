@@ -40,6 +40,9 @@ class UnitGroup(Model):
     name = CharField(max_length=50)
     description = CharField(max_length=500, null=True, blank=True)
 
+    def __str__(self):
+        return '{}'.format(self.name)
+
 
 class Unit(Model):
     id = AutoField(primary_key=True)
@@ -48,12 +51,15 @@ class Unit(Model):
     make = CharField(max_length=50, null=True, blank=True)
     model = CharField(max_length=50, null=True, blank=True)
     license_plate_no = CharField(max_length=20)
-    license_plate_state = ForeignKey(Province, on_delete=RESTRICT)
+    license_plate_province = ForeignKey(Province, on_delete=RESTRICT)
     VIN = CharField(max_length=17, unique=True, validators=[validate_VIN])
     group = ForeignKey(UnitGroup, on_delete=RESTRICT, null=True, blank=True)
 
     class Meta:
-        unique_together = ('license_plate_no', 'license_plate_state')
+        unique_together = ('license_plate_no', 'license_plate_province')
+
+    def __str__(self):
+        return '{}'.format(self.name)
 
     # TODO: add files
 
@@ -81,10 +87,11 @@ class Driver(Model):
     notes = CharField(max_length=500, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        user = User(username=self.email, password=self.email)
-        user.save()
-        user.groups.add(Group.objects.get(name='Drivers'))
-        self.user = user
+        if not self.user:
+            user = User.objects.create_user(username=self.email, password=self.email)
+            user.save()
+            user.groups.add(Group.objects.get(name='Drivers'))
+            self.user = user
         super(Driver,self).save(*args, **kwargs)
 
     # TODO: add file field
@@ -94,10 +101,10 @@ class Log(Model):
     id = BigAutoField(primary_key=True)
     date = DateField()
     driver = ForeignKey(Driver, on_delete=RESTRICT, null=True)
-    from_city = CharField(max_length=35)
-    from_province = ForeignKey(Province, on_delete=RESTRICT, related_name='from_province')
-    to_city = CharField(max_length=35)
-    to_province = ForeignKey(Province, on_delete=RESTRICT, related_name='to_province')
+    from_city = CharField(max_length=35, null=True, blank=True)
+    from_province = ForeignKey(Province, on_delete=RESTRICT, related_name='from_province', null=True, blank=True)
+    to_city = CharField(max_length=35, null=True, blank=True)
+    to_province = ForeignKey(Province, on_delete=RESTRICT, related_name='to_province', null=True, blank=True)
     distance = PositiveSmallIntegerField(null=True, blank=True)
     notes = CharField(max_length=50, null=True, blank=True)
     trucks = ManyToManyField(Truck, null=True, blank=True)
