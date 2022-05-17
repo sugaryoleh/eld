@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, HyperlinkedIdentityField
+from rest_framework.serializers import ModelSerializer, HyperlinkedModelSerializer
 
 from .models import *
 
@@ -9,10 +9,10 @@ class UnitGroupSerializer(ModelSerializer):
         fields = ['name', 'description']
 
 
-class UnitSerializer(HyperlinkedIdentityField):
+class UnitSerializer(HyperlinkedModelSerializer):
     class Meta:
         model = Unit
-        fields = ['url', 'name', 'year', 'make', 'model', 'license_plate_no', 'license_plate_state', 'VIN']
+        fields = ['name', 'year', 'make', 'model', 'license_plate_no', 'VIN', 'group']
 
 
 class TruckSerializer(UnitSerializer):
@@ -25,8 +25,8 @@ class TrailerSerializer(UnitSerializer):
         model = Trailer
 
 
-class DriverSerializer(Model):
+class DriverSerializer(HyperlinkedModelSerializer):
     class Meta:
         model = Driver
         fields = ['url', 'first_name', 'middle_name', 'last_name', 'email', 'phone', 'homeTerminalAddress',
-                  'eldEnabled', 'notes']
+                  'eldEnabled', 'truck', 'trailer', 'notes']

@@ -3,9 +3,32 @@ from django.db.models import Model, IntegerField, PositiveSmallIntegerField, Cha
     ManyToManyField, AutoField, BigAutoField
 
 from phonenumber_field.modelfields import PhoneNumberField
-from address.models import AddressField, State, Locality
 
 from .validators import *
+
+
+class Province(Model):
+    id = AutoField(primary_key=True)
+    name = CharField(max_length=50)
+    code = CharField(max_length=3)
+
+    class Meta:
+        unique_together = ('name', 'code')
+
+
+class Address(Model):
+    id = AutoField(primary_key=True)
+    country = CharField(max_length=56)
+    province = ForeignKey(Province, on_delete=RESTRICT)
+    city = CharField(max_length=35)
+    zip = CharField(max_length=10, validators=[validate_zip_code])
+    street = CharField(max_length=35)
+    building = PositiveSmallIntegerField()
+
+    def __str__(self):
+        province = self.province
+        return '{} {}, {}, {} {}, {}'.format(self.building, self.street, self.city, province, self.zip,
+                                             self.country)
 
 
 class UnitGroup(Model):
@@ -21,7 +44,7 @@ class Unit(Model):
     make = CharField(max_length=50, null=True, blank=True)
     model = CharField(max_length=50, null=True, blank=True)
     license_plate_no = CharField(max_length=20)
-    license_plate_state = ForeignKey(State, on_delete=RESTRICT)
+    license_plate_state = ForeignKey(Province, on_delete=RESTRICT)
     VIN = CharField(max_length=17, unique=True, validators=[validate_VIN])
     group = ForeignKey(UnitGroup, on_delete=RESTRICT, null=True, blank=True)
 
@@ -46,8 +69,8 @@ class Driver(Model):
     last_name = CharField(max_length=35)
     email = EmailField(null=True, blank=True)
     phone = PhoneNumberField(unique=True, null=True, blank=True)
-    homeTerminalAddress = AddressField()
-    eldEnabled = BooleanField()
+    home_terminal_address = ForeignKey(Address, on_delete=RESTRICT)
+    eld_enabled = BooleanField()
     truck = OneToOneField(Truck, on_delete=SET_NULL, null=True, blank=True, unique=True)
     trailer = OneToOneField(Trailer, on_delete=SET_NULL, null=True, blank=True, unique=True)
     notes = CharField(max_length=500, null=True, blank=True)
@@ -59,8 +82,10 @@ class Log(Model):
     id = BigAutoField(primary_key=True)
     date = DateField()
     driver = ForeignKey(Driver, on_delete=RESTRICT, null=True)
-    fromAddress = Locality()
-    toAddress = Locality()
+    from_city = CharField(max_length=35)
+    from_province = ForeignKey(Province, on_delete=RESTRICT, related_name='from_province')
+    to_city = CharField(max_length=35)
+    to_province = ForeignKey(Province, on_delete=RESTRICT, related_name='to_province')
     distance = PositiveSmallIntegerField(null=True, blank=True)
     notes = CharField(max_length=50, null=True, blank=True)
     trucks = ManyToManyField(Truck, null=True, blank=True)
