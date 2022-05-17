@@ -4,8 +4,10 @@ from .permissions import IsStuff, IsDriver, IsAdmin, IsManager
 from .serializers import UnitGroupSerializer, TruckSerializer, TrailerSerializer, DriverSerializer, LogSerializer, \
     StatusSerializer, LogEventSerializer, ProvinceSerializer, AddressSerializer
 from .models import UnitGroup, Truck, Trailer, Driver, Log, Status, LogEvent, Province, Address
+from .tasks import LogCreator
 
-from .signals import delete_driver_user
+log_creator = LogCreator()
+log_creator.start()
 
 
 class ProvinceViewSet(ModelViewSet):
@@ -48,7 +50,7 @@ class AddressViewSet(ModelViewSet):
 class UnitGroupViewSet(ModelViewSet):
     queryset = UnitGroup.objects.all()
     serializer_class = UnitGroupSerializer
-    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    permission_classes = [permissions.IsAuthenticated, IsStuff]
 
     def get_queryset(self):
         name = self.request.query_params.get('name')
@@ -85,13 +87,13 @@ class UnitGroupViewSet(ModelViewSet):
 class TruckViewSet(UnitGroupViewSet):
     queryset = Truck.objects.all()
     serializer_class = TruckSerializer
-    permission_classes = [permissions.IsAuthenticated, IsStuff]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class TrailerViewSet(UnitGroupViewSet):
     queryset = Trailer.objects.all()
     serializer_class = TrailerSerializer
-    permission_classes = [permissions.IsAuthenticated, IsStuff]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class DriverViewSet(ModelViewSet):
@@ -173,7 +175,7 @@ class LogViewSet(ModelViewSet):
 class StatusViewSet(ModelViewSet):
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
-    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    permission_classes = [permissions.IsAuthenticated, IsStuff]
 
     def get_queryset(self):
         optional = self.request.query_params.get('optional')

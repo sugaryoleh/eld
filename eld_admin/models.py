@@ -107,8 +107,8 @@ class Log(Model):
     to_province = ForeignKey(Province, on_delete=RESTRICT, related_name='to_province', null=True, blank=True)
     distance = PositiveSmallIntegerField(null=True, blank=True)
     notes = CharField(max_length=50, null=True, blank=True)
-    trucks = ManyToManyField(Truck, null=True, blank=True)
-    trailers = ManyToManyField(Trailer, null=True, blank=True)
+    trucks = ManyToManyField(Truck)
+    trailers = ManyToManyField(Trailer)
     shipping_docs_uploaded = BooleanField(default=False)
     DVIR_completed = BooleanField(default=False)
 
@@ -134,5 +134,3 @@ class LogEvent(Model):
     odometer_value = PositiveSmallIntegerField(null=True, blank=True)
     notes = CharField(max_length=40)
     # todo: add location
-
-
